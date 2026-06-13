@@ -39,6 +39,6 @@ export class AuthController {
   googleCallback(@Req() req: any, @Res() res: Response) {
     const { access_token } = this.authService.issueToken(req.user);
     // Redirect to frontend with token in query param — frontend stores it
-    res.redirect(`${process.env.FRONTEND_URL ?? 'http://localhost:5173'}/auth/callback?token=${access_token}`);
+    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/callback?token=${access_token}`);
   }
 }
