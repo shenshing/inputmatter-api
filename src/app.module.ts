@@ -37,7 +37,8 @@ import { MailModule } from './mail/mail.module';
         database: config.get<string>('DB_NAME'),
         ssl: { rejectUnauthorized: false },
         entities: [Shop, Feedback, User, UserSubscription, SubscriptionQuota, ContactSubmission],
-        synchronize: process.env.NODE_ENV !== 'production',
+        // synchronize: process.env.NODE_ENV !== 'production',
+        synchronize: true
       }),
     }),
     AuthModule,
