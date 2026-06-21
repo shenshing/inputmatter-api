@@ -22,6 +22,9 @@ export class Shop {
   @Column({ type: 'varchar', default: 'free' })
   plan!: Plan;
 
+  @Column({ type: 'varchar', nullable: true })
+  google_map_url!: string | null;
+
   @CreateDateColumn({ type: 'timestamp' })
   created_at!: Date;
 
