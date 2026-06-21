@@ -17,6 +17,9 @@ export class Feedback {
   @Column({ type: 'text' })
   description!: string;
 
+  @Column({ type: 'int', nullable: true })
+  rating!: number | null;
+
   @Column({ type: 'jsonb' })
   categories!: string[];
 
