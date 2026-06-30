@@ -16,6 +16,8 @@ import { SubscriptionQuota } from './subscription/subscription-quota.entity';
 import { ContactModule } from './contact/contact.module';
 import { ContactSubmission } from './contact/contact-submission.entity';
 import { MailModule } from './mail/mail.module';
+import { AppVisitorModule } from './app-visitor/app-visitor.module';
+import { AppVisitor } from './app-visitor/app-visitor.entity';
 
 @Module({
   imports: [
@@ -36,7 +38,7 @@ import { MailModule } from './mail/mail.module';
         password: config.get<string>('DB_PASS'),
         database: config.get<string>('DB_NAME'),
         ssl: { rejectUnauthorized: false },
-        entities: [Shop, Feedback, User, UserSubscription, SubscriptionQuota, ContactSubmission],
+        entities: [Shop, Feedback, User, UserSubscription, SubscriptionQuota, ContactSubmission, AppVisitor],
         // synchronize: process.env.NODE_ENV !== 'production',
         synchronize: true
       }),
@@ -47,6 +49,7 @@ import { MailModule } from './mail/mail.module';
     SubscriptionModule,
     MailModule,
     ContactModule,
+    AppVisitorModule,
   ],
   controllers: [AppController],
   providers: [AppService],
