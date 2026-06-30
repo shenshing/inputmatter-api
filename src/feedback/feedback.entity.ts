@@ -23,6 +23,9 @@ export class Feedback {
   @Column({ type: 'jsonb' })
   categories!: string[];
 
+  @Column({ type: 'varchar', length: 20, nullable: true, default: 'web' })
+  source!: string | null;
+
   @Column({ type: 'text' })
   shop_name!: string;
 

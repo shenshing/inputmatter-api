@@ -39,6 +39,7 @@ export class FeedbackService {
       categories: dto.categories,
       shop,
       shop_name: shopName,
+      source: dto.source ?? 'web',
     });
 
     const saved = await this.feedbackRepo.save(feedback);
