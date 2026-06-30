@@ -11,6 +11,8 @@ import {
   ArrayMinSize,
 } from 'class-validator';
 
+const VALID_SOURCES = ['web', 'telegram'];
+
 const VALID_CATEGORIES = ['taste', 'service', 'environment', 'other'];
 
 export class CreateFeedbackDto {
@@ -34,4 +36,9 @@ export class CreateFeedbackDto {
   @MinLength(5)
   @MaxLength(100)
   shopName?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(VALID_SOURCES)
+  source?: string;
 }
