@@ -55,4 +55,8 @@ export class FeedbackService {
   findAll(): Promise<Feedback[]> {
     return this.feedbackRepo.find({ order: { created_at: 'DESC' } });
   }
+
+  count(): Promise<number> {
+    return this.feedbackRepo.count();
+  }
 }

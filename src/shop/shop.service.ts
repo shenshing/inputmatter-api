@@ -1,7 +1,15 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Plan, Shop } from './shop.entity';
+
+// Hand-picked for the welcome page's "Popular near you" section — one per major chain.
+const FEATURED_SHOP_NAMES = [
+  'BROWN Roastery BKK',
+  'Starbucks BKK',
+  'TUBE COFFEE Villa Keng Kang',
+  'KOI Thé VILLA KENG KANG',
+];
 
 @Injectable()
 export class ShopService {
@@ -12,6 +20,13 @@ export class ShopService {
 
   findAll(): Promise<Shop[]> {
     return this.shopRepo.find({ order: { name: 'ASC' } });
+  }
+
+  async findPopular(): Promise<Shop[]> {
+    const shops = await this.shopRepo.findBy({ name: In(FEATURED_SHOP_NAMES) });
+    return shops.sort(
+      (a, b) => FEATURED_SHOP_NAMES.indexOf(a.name) - FEATURED_SHOP_NAMES.indexOf(b.name),
+    );
   }
 
   findByOwnerId(ownerId: string): Promise<Shop | null> {
