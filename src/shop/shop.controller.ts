@@ -21,6 +21,12 @@ export class ShopController {
     return this.shopService.findAll();
   }
 
+  // Public — hand-picked shops for the welcome page's "Popular near you" section
+  @Get('popular')
+  findPopular(): Promise<Shop[]> {
+    return this.shopService.findPopular();
+  }
+
   // Returns the shop owned by the currently logged-in shop-admin (null if none)
   @Get('mine')
   @UseGuards(JwtAuthGuard, RolesGuard)
