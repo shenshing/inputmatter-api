@@ -15,6 +15,12 @@ export class FeedbackController {
     return this.feedbackService.create(dto);
   }
 
+  // Public — total feedback count for marketing/stat displays
+  @Get('count')
+  async count(): Promise<{ count: number }> {
+    return { count: await this.feedbackService.count() };
+  }
+
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('super-admin', 'shop-admin')
