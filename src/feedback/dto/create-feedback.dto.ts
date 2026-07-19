@@ -1,4 +1,6 @@
 import {
+  ArrayMaxSize,
+  ArrayMinSize,
   IsArray,
   IsIn,
   IsInt,
@@ -6,10 +8,13 @@ import {
   IsOptional,
   IsPositive,
   IsString,
+  Max,
   MaxLength,
+  Min,
   MinLength,
-  ArrayMinSize,
 } from 'class-validator';
+
+const MAX_IMAGES = 3;
 
 const VALID_SOURCES = ['web', 'telegram'];
 
@@ -41,4 +46,17 @@ export class CreateFeedbackDto {
   @IsString()
   @IsIn(VALID_SOURCES)
   source?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(5)
+  rating?: number;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(MAX_IMAGES)
+  @IsString({ each: true })
+  @MaxLength(2048, { each: true })
+  imageUrls?: string[];
 }
