@@ -26,6 +26,12 @@ export class Feedback {
   @Column({ type: 'varchar', length: 20, nullable: true, default: 'web' })
   source!: string | null;
 
+  @Column({ type: 'jsonb', nullable: true })
+  image_urls!: string[] | null;
+
+  @Column({ type: 'boolean', default: true })
+  is_public!: boolean;
+
   @Column({ type: 'text' })
   shop_name!: string;
 

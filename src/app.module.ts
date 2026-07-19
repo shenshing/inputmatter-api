@@ -18,6 +18,7 @@ import { ContactSubmission } from './contact/contact-submission.entity';
 import { MailModule } from './mail/mail.module';
 import { AppVisitorModule } from './app-visitor/app-visitor.module';
 import { AppVisitor } from './app-visitor/app-visitor.entity';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -40,7 +41,7 @@ import { AppVisitor } from './app-visitor/app-visitor.entity';
         ssl: { rejectUnauthorized: false },
         entities: [Shop, Feedback, User, UserSubscription, SubscriptionQuota, ContactSubmission, AppVisitor],
         // synchronize: process.env.NODE_ENV !== 'production',
-        synchronize: true
+        synchronize: false 
       }),
     }),
     AuthModule,
@@ -50,6 +51,7 @@ import { AppVisitor } from './app-visitor/app-visitor.entity';
     MailModule,
     ContactModule,
     AppVisitorModule,
+    UploadsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
