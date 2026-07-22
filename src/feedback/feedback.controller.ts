@@ -1,8 +1,9 @@
-import { BadRequestException, Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
+import { UpdateFeedbackVisibilityDto } from './dto/update-feedback-visibility.dto';
 import { Feedback } from './feedback.entity';
 import { FeedbackService, PublicFeedback } from './feedback.service';
 
@@ -48,5 +49,16 @@ export class FeedbackController {
   @Roles('super-admin', 'shop-admin')
   findAll(): Promise<Feedback[]> {
     return this.feedbackService.findAll();
+  }
+
+  // Super-admin only — ban/unban a single piece of feedback from the public feed.
+  @Patch(':id/visibility')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super-admin')
+  updateVisibility(
+    @Param('id') id: string,
+    @Body() dto: UpdateFeedbackVisibilityDto,
+  ): Promise<Feedback> {
+    return this.feedbackService.updateVisibility(id, dto.isPublic);
   }
 }

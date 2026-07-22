@@ -2,6 +2,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Plan, Shop } from './shop.entity';
+import { Feedback } from '../feedback/feedback.entity';
 
 // Hand-picked for the welcome page's "Popular near you" section — one per major chain.
 const FEATURED_SHOP_NAMES = [
@@ -16,17 +17,51 @@ export class ShopService {
   constructor(
     @InjectRepository(Shop)
     private readonly shopRepo: Repository<Shop>,
+    @InjectRepository(Feedback)
+    private readonly feedbackRepo: Repository<Feedback>,
   ) {}
 
+  // Public-facing — only shops a super-admin hasn't hidden. Used by the
+  // feedback form's shop picker and the public "Places" directory.
   findAll(): Promise<Shop[]> {
-    return this.shopRepo.find({ order: { name: 'ASC' } });
+    return this.shopRepo.find({ where: { is_public: true }, order: { name: 'ASC' } });
   }
 
   async findPopular(): Promise<Shop[]> {
-    const shops = await this.shopRepo.findBy({ name: In(FEATURED_SHOP_NAMES) });
+    const shops = await this.shopRepo.findBy({ name: In(FEATURED_SHOP_NAMES), is_public: true });
     return shops.sort(
       (a, b) => FEATURED_SHOP_NAMES.indexOf(a.name) - FEATURED_SHOP_NAMES.indexOf(b.name),
     );
+  }
+
+  // Unfiltered — used where visibility shouldn't matter, e.g. resolving a
+  // shopId on feedback submission (a hidden shop can still receive feedback).
+  findById(id: number): Promise<Shop | null> {
+    return this.shopRepo.findOneBy({ id });
+  }
+
+  // Super-admin only — every shop regardless of visibility, with a feedback
+  // count per shop for the admin Shops tab.
+  async findAllForAdmin(): Promise<(Shop & { feedbackCount: number })[]> {
+    const shops = await this.shopRepo.find({ order: { name: 'ASC' } });
+
+    const counts = await this.feedbackRepo
+      .createQueryBuilder('feedback')
+      .select('feedback.shop_id', 'shopId')
+      .addSelect('COUNT(*)', 'count')
+      .where('feedback.shop_id IS NOT NULL')
+      .groupBy('feedback.shop_id')
+      .getRawMany<{ shopId: number; count: string }>();
+    const countByShopId = new Map(counts.map((c) => [Number(c.shopId), Number(c.count)]));
+
+    return shops.map((shop) => ({ ...shop, feedbackCount: countByShopId.get(shop.id) ?? 0 }));
+  }
+
+  async updateVisibility(id: number, isPublic: boolean): Promise<Shop> {
+    const shop = await this.shopRepo.findOneBy({ id });
+    if (!shop) throw new NotFoundException(`Shop with id ${id} not found`);
+    shop.is_public = isPublic;
+    return this.shopRepo.save(shop);
   }
 
   findByOwnerId(ownerId: string): Promise<Shop | null> {
