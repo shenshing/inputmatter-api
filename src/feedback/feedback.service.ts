@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Feedback } from './feedback.entity';
@@ -21,8 +21,10 @@ export class FeedbackService {
     let shopName: string;
 
     if (dto.shopId != null) {
-      const shops = await this.shopService.findAll();
-      shop = shops.find((s) => s.id === dto.shopId) ?? null;
+      // Unfiltered lookup — a shop hidden from public listings can still
+      // receive feedback (e.g. an existing QR code pointing at it); "hidden"
+      // only affects discovery, not whether it can be submitted to.
+      shop = await this.shopService.findById(dto.shopId);
       if (!shop) {
         throw new BadRequestException(`Shop with id ${dto.shopId} not found`);
       }
@@ -62,6 +64,14 @@ export class FeedbackService {
     return this.feedbackRepo.count();
   }
 
+  // Super-admin only — ban/unban a single piece of feedback from the public feed.
+  async updateVisibility(id: string, isPublic: boolean): Promise<Feedback> {
+    const feedback = await this.feedbackRepo.findOneBy({ id });
+    if (!feedback) throw new NotFoundException(`Feedback with id ${id} not found`);
+    feedback.is_public = isPublic;
+    return this.feedbackRepo.save(feedback);
+  }
+
   // Public — paginated public feedback for a single shop, shown on the
   // feedback form so visitors can see what others said before/after
   // submitting. Page 1 is fetched on shop selection; later pages are only
@@ -72,7 +82,9 @@ export class FeedbackService {
     page = 1,
   ): Promise<{ items: PublicFeedback[]; total: number; page: number; totalPages: number }> {
     const limit = FEEDBACK_PUBLIC_PAGE_SIZE;
-    const where = { shop: { id: shopId }, is_public: true } as const;
+    // Nested shop.is_public check: a shop hidden by a super-admin shouldn't
+    // leak its feedback via a direct link either, not just from listings.
+    const where = { shop: { id: shopId, is_public: true }, is_public: true } as const;
 
     const [entries, total] = await this.feedbackRepo.findAndCount({
       where,

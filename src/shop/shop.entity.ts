@@ -28,6 +28,9 @@ export class Shop {
   @Column({ type: 'varchar', nullable: true })
   logo_url!: string | null;
 
+  @Column({ type: 'boolean', default: true })
+  is_public!: boolean;
+
   @CreateDateColumn({ type: 'timestamp' })
   created_at!: Date;
 
