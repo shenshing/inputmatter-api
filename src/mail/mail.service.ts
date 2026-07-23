@@ -109,6 +109,23 @@ export class MailService {
     await this.telegramPost(token, chatId, lines);
   }
 
+  // Generic Telegram push for non-contact notifications (e.g. the daily report) — same bot/chat, caller-supplied title.
+  async sendTelegramReport(data: {
+    title: string;
+    lines: string[];
+  }): Promise<void> {
+    const token = this.config.get<string>('TELEGRAM_BOT_TOKEN');
+    const chatId = this.config.get<string>('TELEGRAM_CHAT_ID');
+
+    if (!token || !chatId) {
+      this.logger.log(`[${data.title} — Telegram not configured]`);
+      return;
+    }
+
+    const text = [`<b>${data.title}</b>`, ``, ...data.lines].join('\n');
+    await this.telegramPost(token, chatId, text);
+  }
+
   private telegramPost(token: string, chatId: string, text: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const body = JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' });

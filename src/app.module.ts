@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -19,6 +20,7 @@ import { MailModule } from './mail/mail.module';
 import { AppVisitorModule } from './app-visitor/app-visitor.module';
 import { AppVisitor } from './app-visitor/app-visitor.entity';
 import { UploadsModule } from './uploads/uploads.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [
@@ -29,6 +31,7 @@ import { UploadsModule } from './uploads/uploads.module';
         join(__dirname, '..', '.env'),
       ],
     }),
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
@@ -52,6 +55,7 @@ import { UploadsModule } from './uploads/uploads.module';
     ContactModule,
     AppVisitorModule,
     UploadsModule,
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
