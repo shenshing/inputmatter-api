@@ -50,7 +50,7 @@ export class ShopController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('shop-admin')
   async createShop(@Req() req: any, @Body() dto: CreateShopDto): Promise<Shop> {
-    const shop = await this.shopService.createShop(dto.name, req.user.id, dto.plan, dto.google_map_url);
+    const shop = await this.shopService.createShop(dto.name, req.user.id, dto.plan, dto.google_map_url, dto.social_link);
     await this.subscriptionService.initialize(shop.id, shop.plan);
     return shop;
   }

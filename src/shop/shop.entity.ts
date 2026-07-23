@@ -8,6 +8,11 @@ import {
 
 export type Plan = 'free' | 'basic' | 'standard' | 'plus';
 
+export interface ShopSocialLink {
+  name: string;
+  social_link: string;
+}
+
 @Entity()
 export class Shop {
   @PrimaryGeneratedColumn()
@@ -27,6 +32,13 @@ export class Shop {
 
   @Column({ type: 'varchar', nullable: true })
   logo_url!: string | null;
+
+  // Named profile links — e.g. [{ name: 'tiktok', social_link: 'https://...' }].
+  // Only a subset (currently Google Maps + TikTok) is actually rendered on
+  // the feedback form today (see FeedbackForm.tsx); the array leaves room
+  // for more platforms later without another migration.
+  @Column({ type: 'jsonb', nullable: true })
+  social_link!: ShopSocialLink[] | null;
 
   @Column({ type: 'boolean', default: true })
   is_public!: boolean;

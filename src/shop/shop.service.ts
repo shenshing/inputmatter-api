@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { Plan, Shop } from './shop.entity';
+import { Plan, Shop, ShopSocialLink } from './shop.entity';
 import { Feedback } from '../feedback/feedback.entity';
 
 // Hand-picked for the welcome page's "Popular near you" section — one per major chain.
@@ -73,6 +73,7 @@ export class ShopService {
     ownerId: string,
     plan: string = 'free',
     google_map_url?: string,
+    social_link?: ShopSocialLink[],
   ): Promise<Shop> {
     const existing = await this.shopRepo.findOneBy({ ownerId });
     if (existing) throw new ConflictException('You already have a registered shop');
@@ -80,7 +81,13 @@ export class ShopService {
     const nameTaken = await this.shopRepo.findOneBy({ name });
     if (nameTaken) throw new ConflictException('A shop with this name already exists');
 
-    const shop = this.shopRepo.create({ name, ownerId, plan: plan as Plan, google_map_url: google_map_url ?? null });
+    const shop = this.shopRepo.create({
+      name,
+      ownerId,
+      plan: plan as Plan,
+      google_map_url: google_map_url ?? null,
+      social_link: social_link ?? null,
+    });
     return this.shopRepo.save(shop);
   }
 
