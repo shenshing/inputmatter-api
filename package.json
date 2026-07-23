@@ -21,6 +21,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "seed:shops": "ts-node -r tsconfig-paths/register src/database/seeds/shop.seed.ts",
+    "seed:coffee-shops": "ts-node -r tsconfig-paths/register src/database/seeds/coffee-shops.seed.ts",
     "seed:feedback": "ts-node -r tsconfig-paths/register src/database/seeds/feedback.seed.ts",
     "seed:subscriptions": "ts-node -r tsconfig-paths/register src/database/seeds/subscription.seed.ts",
     "seed:quota-test": "ts-node -r tsconfig-paths/register src/database/seeds/quota-test.seed.ts"
@@ -32,6 +33,7 @@
     "@nestjs/jwt": "^11.0.2",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/schedule": "^6.1.3",
     "@nestjs/typeorm": "^11.0.1",
     "@supabase/supabase-js": "^2.110.7",
     "bcrypt": "^6.0.0",
