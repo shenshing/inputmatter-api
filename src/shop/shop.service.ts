@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Plan, Shop, ShopSocialLink } from './shop.entity';
 import { Feedback } from '../feedback/feedback.entity';
+import { resolveGoogleMapLongUrl } from './google-maps.util';
 
 // Hand-picked for the welcome page's "Popular near you" section — one per major chain.
 const FEATURED_SHOP_NAMES = [
@@ -81,11 +82,14 @@ export class ShopService {
     const nameTaken = await this.shopRepo.findOneBy({ name });
     if (nameTaken) throw new ConflictException('A shop with this name already exists');
 
+    const google_map_long_url = google_map_url ? await resolveGoogleMapLongUrl(google_map_url) : null;
+
     const shop = this.shopRepo.create({
       name,
       ownerId,
       plan: plan as Plan,
       google_map_url: google_map_url ?? null,
+      google_map_long_url,
       social_link: social_link ?? null,
     });
     return this.shopRepo.save(shop);
