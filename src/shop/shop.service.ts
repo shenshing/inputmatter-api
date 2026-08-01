@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { Plan, Shop, ShopSocialLink } from './shop.entity';
+import { Plan, Shop, ShopCategory, ShopSocialLink } from './shop.entity';
 import { Feedback } from '../feedback/feedback.entity';
 import { resolveGoogleMapLongUrl } from './google-maps.util';
 
@@ -75,6 +75,7 @@ export class ShopService {
     plan: string = 'free',
     google_map_url?: string,
     social_link?: ShopSocialLink[],
+    categories?: ShopCategory[],
   ): Promise<Shop> {
     const existing = await this.shopRepo.findOneBy({ ownerId });
     if (existing) throw new ConflictException('You already have a registered shop');
@@ -91,6 +92,9 @@ export class ShopService {
       google_map_url: google_map_url ?? null,
       google_map_long_url,
       social_link: social_link ?? null,
+      // Left unset (rather than defaulted) when not provided, so the column's
+      // own empty-array default applies — categorizing a shop is optional.
+      ...(categories ? { categories } : {}),
     });
     return this.shopRepo.save(shop);
   }
@@ -99,6 +103,17 @@ export class ShopService {
     const shop = await this.shopRepo.findOneBy({ ownerId });
     if (!shop) throw new NotFoundException('No shop found for this account');
     shop.plan = plan as Plan;
+    return this.shopRepo.save(shop);
+  }
+
+  // Additive only, by design: merges the given categories into whatever the
+  // shop already has and never drops one, regardless of what's passed in —
+  // there's deliberately no way for a shop-admin to remove a category
+  // themselves (that requires an InputMatter admin).
+  async addCategories(ownerId: string, categories: ShopCategory[]): Promise<Shop> {
+    const shop = await this.shopRepo.findOneBy({ ownerId });
+    if (!shop) throw new NotFoundException('No shop found for this account');
+    shop.categories = Array.from(new Set([...shop.categories, ...categories]));
     return this.shopRepo.save(shop);
   }
 

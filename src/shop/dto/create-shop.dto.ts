@@ -1,6 +1,7 @@
 import { IsString, MinLength, MaxLength, IsOptional, IsIn, IsArray, ArrayMaxSize, ArrayUnique, ValidateNested, Matches } from 'class-validator';
 import { Type } from 'class-transformer';
 import { SocialLinkDto, SOCIAL_PLATFORMS } from './social-link.dto';
+import { SHOP_CATEGORIES, ShopCategory } from '../shop.entity';
 
 export class CreateShopDto {
   @IsString()
@@ -26,4 +27,10 @@ export class CreateShopDto {
   @ValidateNested({ each: true })
   @Type(() => SocialLinkDto)
   social_link?: SocialLinkDto[];
+
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @IsIn(SHOP_CATEGORIES, { each: true })
+  categories?: ShopCategory[];
 }
