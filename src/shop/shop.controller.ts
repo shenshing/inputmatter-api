@@ -5,6 +5,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { CreateShopDto } from './dto/create-shop.dto';
 import { UpdatePlanDto } from './dto/update-plan.dto';
 import { UpdateShopVisibilityDto } from './dto/update-shop-visibility.dto';
+import { AddShopCategoriesDto } from './dto/add-shop-categories.dto';
 import { ShopService } from './shop.service';
 import { SubscriptionService } from '../subscription/subscription.service';
 import { Shop } from './shop.entity';
@@ -50,7 +51,7 @@ export class ShopController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('shop-admin')
   async createShop(@Req() req: any, @Body() dto: CreateShopDto): Promise<Shop> {
-    const shop = await this.shopService.createShop(dto.name, req.user.id, dto.plan, dto.google_map_url, dto.social_link);
+    const shop = await this.shopService.createShop(dto.name, req.user.id, dto.plan, dto.google_map_url, dto.social_link, dto.categories);
     await this.subscriptionService.initialize(shop.id, shop.plan);
     return shop;
   }
@@ -61,6 +62,15 @@ export class ShopController {
   @Roles('shop-admin')
   updatePlan(@Req() req: any, @Body() dto: UpdatePlanDto): Promise<Shop> {
     return this.shopService.updatePlan(req.user.id, dto.plan);
+  }
+
+  // Adds categories to the currently logged-in shop-admin's shop. Additive
+  // only — can't be used to remove a category (see ShopService#addCategories).
+  @Patch('mine/categories')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('shop-admin')
+  addCategories(@Req() req: any, @Body() dto: AddShopCategoriesDto): Promise<Shop> {
+    return this.shopService.addCategories(req.user.id, dto.categories);
   }
 
   // Super-admin only — show/hide a shop from all public-facing listings

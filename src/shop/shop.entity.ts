@@ -8,6 +8,11 @@ import {
 
 export type Plan = 'free' | 'basic' | 'standard' | 'plus';
 
+// A shop can belong to more than one category (e.g. a place that's both a
+// cafe and a restaurant), hence the array column rather than a single value.
+export const SHOP_CATEGORIES = ['cafe', 'restaurant'] as const;
+export type ShopCategory = (typeof SHOP_CATEGORIES)[number];
+
 export interface ShopSocialLink {
   name: string;
   social_link: string;
@@ -52,6 +57,12 @@ export class Shop {
 
   @Column({ type: 'boolean', default: true })
   is_public!: boolean;
+
+  // Not set automatically on shop creation — new shops start uncategorized
+  // ('{}') until a category-picker flow exists. Existing shops were
+  // backfilled to ['cafe'] via add-shop-categories.ts.
+  @Column({ type: 'enum', enum: SHOP_CATEGORIES, array: true, default: '{}' })
+  categories!: ShopCategory[];
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at!: Date;
