@@ -21,6 +21,7 @@ import { AppVisitorModule } from './app-visitor/app-visitor.module';
 import { AppVisitor } from './app-visitor/app-visitor.entity';
 import { UploadsModule } from './uploads/uploads.module';
 import { ReportsModule } from './reports/reports.module';
+import { TranscriptionModule } from './transcription/transcription.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { ReportsModule } from './reports/reports.module';
     AppVisitorModule,
     UploadsModule,
     ReportsModule,
+    TranscriptionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
