@@ -22,3 +22,6 @@ lerna-debug.log*
 # temp directory
 .temp
 .tmp
+
+# downloaded speech-to-text model weights (redownloaded on demand)
+.model-cache
