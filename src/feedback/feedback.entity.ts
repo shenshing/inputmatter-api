@@ -32,6 +32,12 @@ export class Feedback {
   @Column({ type: 'boolean', default: true })
   is_public!: boolean;
 
+  // Catch-all for data that comes with a feedback record but has no column of
+  // its own — e.g. for feedback imported from Google Maps: author_name,
+  // relative_date ("2 years ago", not a real timestamp), likes_count, owner_reply.
+  @Column({ type: 'jsonb', nullable: true })
+  metadata!: Record<string, unknown> | null;
+
   @Column({ type: 'text' })
   shop_name!: string;
 

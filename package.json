@@ -22,7 +22,9 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "seed:shops": "ts-node -r tsconfig-paths/register src/database/seeds/shop.seed.ts",
     "seed:feedback": "ts-node -r tsconfig-paths/register src/database/seeds/feedback.seed.ts",
-    "seed:subscriptions": "ts-node -r tsconfig-paths/register src/database/seeds/subscription.seed.ts"
+    "seed:subscriptions": "ts-node -r tsconfig-paths/register src/database/seeds/subscription.seed.ts",
+    "sync:dev-schema": "ts-node -r tsconfig-paths/register src/database/sync-dev-schema.ts",
+    "sync:production-schema": "ts-node -r tsconfig-paths/register src/database/sync-production-schema.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
