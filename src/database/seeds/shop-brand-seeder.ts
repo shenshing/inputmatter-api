@@ -53,7 +53,14 @@ const INCLUDE_NO_LOGO =
 
 export interface ShopBrandLocation {
   name: string;
-  google_map_url: string;
+  /** A maps.app.goo.gl short link, as given by the user — resolved to
+   * google_map_long_url server-side below. Use null when only a
+   * pre-resolved long URL is available (e.g. scraper output, which
+   * captures the long URL directly and never has a short link). */
+  google_map_url: string | null;
+  /** Pre-resolved long URL — set this instead of triggering resolution
+   * when the source data already has it (see google_map_url above). */
+  google_map_long_url?: string;
 }
 
 export interface ShopBrand {
@@ -160,9 +167,11 @@ export async function seedShopBrands(
     if (logoUrl) console.log(`Uploaded logo for ${brand.slug}: ${logoUrl}`);
 
     for (const location of newLocations) {
-      const google_map_long_url = await resolveGoogleMapLongUrl(
-        location.google_map_url,
-      );
+      const google_map_long_url =
+        location.google_map_long_url ??
+        (location.google_map_url
+          ? await resolveGoogleMapLongUrl(location.google_map_url)
+          : null);
       if (!google_map_long_url) {
         console.warn(`  ⚠ Could not resolve long URL for: ${location.name}`);
       }
