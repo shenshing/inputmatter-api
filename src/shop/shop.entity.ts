@@ -10,7 +10,20 @@ export type Plan = 'free' | 'basic' | 'standard' | 'plus';
 
 // A shop can belong to more than one category (e.g. a place that's both a
 // cafe and a restaurant), hence the array column rather than a single value.
-export const SHOP_CATEGORIES = ['cafe', 'restaurant', 'hotpot'] as const;
+export const SHOP_CATEGORIES = [
+  'cafe',
+  'restaurant',
+  'hotpot',
+  'korean',
+  'chinese',
+  'japanese',
+  'khmer',
+  'seafood',
+  'bbq',
+  'steakhouse',
+  'fine_dining',
+  'fast_food',
+] as const;
 export type ShopCategory = (typeof SHOP_CATEGORIES)[number];
 
 export interface ShopSocialLink {
@@ -50,6 +63,15 @@ export class Shop {
   @Column({ type: 'varchar', nullable: true })
   logo_url!: string | null;
 
+  // Google's stable per-location feature ID (the `0x<hex>:0x<hex>` pair embedded
+  // in every Maps URL, e.g. from `!1s0x310957bdc77e0177:0xb5eb43be9437aa38!8m2`).
+  // Unlike name, this never changes even if a listing gets renamed — used by the
+  // restaurant-discovery pipeline (scraper/discover-restaurants.js) to dedup
+  // candidates exactly instead of by fuzzy name matching. Only that pipeline
+  // writes this column for now; existing rows are NULL until backfilled later.
+  @Column({ type: 'varchar', nullable: true, unique: true })
+  google_place_id!: string | null;
+
   @Column({ type: 'varchar', nullable: true })
   phone!: string | null;
 
@@ -63,7 +85,10 @@ export class Shop {
   // hours: '9:30 AM–9:30 PM' }, ...] }. Named "opening_hours" (not "hours") to stay
   // distinct from one-off holiday/closure announcements, which live in their own table.
   @Column({ type: 'jsonb', nullable: true })
-  opening_hours!: { status: string | null; schedule: { day: string; hours: string }[] | null } | null;
+  opening_hours!: {
+    status: string | null;
+    schedule: { day: string; hours: string }[] | null;
+  } | null;
 
   // Named profile links — e.g. [{ name: 'tiktok', social_link: 'https://...' }].
   // Not yet rendered anywhere on the feedback form; stored for future use.
